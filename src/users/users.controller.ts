@@ -25,9 +25,19 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('username/:username')
+  findOneByUsername(@Param('username') username: string) {
+    return this.usersService.findOneByUsername(username);
+  }
+
+  @Get('group/:groupId')
+  findAllUsersByGroup(@Param('groupId') groupId: string) {
+    return this.usersService.findAllUsersByGroup(+groupId);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOneById(@Param('id') id: string) {
+    return this.usersService.findOneById(+id);
   }
 
   @Patch(':id')

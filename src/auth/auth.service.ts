@@ -16,7 +16,7 @@ export class AuthService {
     username,
     password,
   }: AuthPayloadDto): Promise<User | null> {
-    const findUser: User = await this.usersService.findByUsername(username);
+    const findUser: User = await this.usersService.findOneByUsername(username);
     if (!findUser) {
       return null;
     }
