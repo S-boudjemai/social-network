@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Request } from './entities/request.entity';
 import { User } from 'src/users/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Injectable()
 export class RequestsService {
@@ -13,8 +14,11 @@ export class RequestsService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async create(createRequestDto: CreateRequestDto) {
-    const request = this.requestsRepository.create(createRequestDto);
+  async create(createRequestDto: CreateRequestDto, requesterId: number) {
+    const request = this.requestsRepository.create({
+      ...createRequestDto,
+      requester_id: requesterId,
+    });
     return await this.requestsRepository.save(request);
   }
 
@@ -31,12 +35,14 @@ export class RequestsService {
   }
 
   async findAllRequestsByGroup(groupId: number) {
+    // Trouver tous les utilisateurs dans le groupe
     const usersInGroup = await this.usersRepository.find({
       where: { group: { id: groupId } },
     });
-
+    // Map les ids des utilisateurs dans un tableau
     const requesterIds = usersInGroup.map((user) => user.id);
 
+    // Trouver les rerquester id des utilisateurs dans le groupe
     const requests = await this.requestsRepository.find({
       where: {
         requester_id: In(requesterIds),
